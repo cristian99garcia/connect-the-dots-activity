@@ -1,0 +1,6 @@
+[Activity]
+name = Connect the Dots
+activity_version = 1
+bundle_id = org.sugarlabs.ConnectTheDots
+icon = activity-icon
+exec = sugar-activity activity.ConnectTheDotsActivity
