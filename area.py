@@ -89,15 +89,21 @@ class Area(Gtk.DrawingArea):
             self.draw_lines(context)
             self.draw_dots(context)
 
-            star_x = self.level_data["star"][0] - self.star_pixbuf.get_width() / 2
-            star_y = self.level_data["star"][1] - self.star_pixbuf.get_height() / 2
+            star_x = self.level_data["star"][0] - \
+                self.star_pixbuf.get_width() / 2
+
+            star_y = self.level_data["star"][1] - \
+                self.star_pixbuf.get_height() / 2
+
             pen_x = self.pen[0] - self.pen_pixbuf.get_width() / 2
             pen_y = self.pen[1] - self.pen_pixbuf.get_height() / 2
 
-            Gdk.cairo_set_source_pixbuf(context, self.star_pixbuf, star_x, star_y)
+            Gdk.cairo_set_source_pixbuf(
+                context, self.star_pixbuf, star_x, star_y)
             context.paint()
 
-            Gdk.cairo_set_source_pixbuf(context, self.pen_pixbuf, pen_x, pen_y)
+            Gdk.cairo_set_source_pixbuf(
+                context, self.pen_pixbuf, pen_x, pen_y)
             context.paint()
 
     def __press_cb(self, widget, event):
@@ -126,23 +132,33 @@ class Area(Gtk.DrawingArea):
 
         width = self.pen_pixbuf.get_width()
         height = self.pen_pixbuf.get_height()
-        rect2 = make_rect(self.pen[0] - width / 2, self.pen[1] - height / 2, width, height)
+        rect2 = make_rect(
+            self.pen[0] - width / 2, self.pen[1] - height / 2, width, height)
 
-        collision = rect1.x >= rect2.x and rect1.x <= rect2.x + rect2.width and rect1.y >= rect2.y and rect1.y <= rect2.y + rect2.height
+        collision = rect1.x >= rect2.x and \
+            rect1.x <= rect2.x + rect2.width and \
+            rect1.y >= rect2.y and \
+            rect1.y <= rect2.y + rect2.height
 
-        if collision and not self.over_pen:
+        if collision and not self.over_pen and not self.add_points:
             self.over_pen = True
-            self.pen_pixbuf = self.pen_pixbuf.scale_simple(72, 72, GdkPixbuf.InterpType.HYPER)
+            self.pen_pixbuf = self.pen_pixbuf.scale_simple(
+                72, 72, GdkPixbuf.InterpType.HYPER)
 
-        elif not collision and self.over_pen:
+        elif not collision and self.over_pen and not self.add_points:
             self.over_pen = False
             self.pen_pixbuf = GdkPixbuf.Pixbuf.new_from_file("images/pen.svg")
 
         if self.add_points:
-            x = event.x if event.x >= 0 else 0
-            x = x if x <= alloc.width else alloc.width
-            y = event.y if event.y >= 0 else 0
-            y = y if y <= alloc.height else alloc.height
+            min_x = self.pen_pixbuf.get_width() / 2
+            max_x = alloc.width - min_x
+            min_y = self.pen_pixbuf.get_height() / 2
+            max_y = alloc.height - min_y
+
+            x = event.x if event.x >= min_x else min_x
+            x = x if x <= max_x else max_x
+            y = event.y if event.y >= min_y else min_y
+            y = y if y <= max_y else max_y
 
             self.pen = [x, y]
             self.points[self.color_count][1].append(self.pen)
@@ -155,13 +171,15 @@ class Area(Gtk.DrawingArea):
         index = 1
 
         context.set_font_size(20)
-        context.select_font_face("Arial", cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_BOLD)
+        context.select_font_face(
+            "Arial", cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_BOLD)
 
         for dot in self.level_data["dots"]:
             x = dot[0]
             y = dot[1]
             label = str(index)
-            xb, yb, label_width, label_height, xa, ya = context.text_extents(label)
+            xb, yb, label_width, label_height, xa, ya = \
+                context.text_extents(label)
 
             context.set_source_rgb(1, 1, 1)
             context.arc(x, y, dot_radius, 0, 2 * math.pi)
@@ -201,7 +219,8 @@ class Area(Gtk.DrawingArea):
     def load_pixbufs(self):
         self.pen_pixbuf = GdkPixbuf.Pixbuf.new_from_file("images/pen.svg")
         self.star_pixbuf = GdkPixbuf.Pixbuf.new_from_file("images/star.svg")
-        self.star_pixbuf = self.star_pixbuf.scale_simple(30, 30, GdkPixbuf.InterpType.HYPER)
+        self.star_pixbuf = self.star_pixbuf.scale_simple(
+            30, 30, GdkPixbuf.InterpType.HYPER)
 
     def next_level(self):
         self.level += 1
@@ -221,9 +240,9 @@ class Area(Gtk.DrawingArea):
 
     def get_random_level(self):
         alloc = self.get_allocation()
-        min_x = 15
+        min_x = self.pen_pixbuf.get_width() / 2
         max_x = alloc.width - min_x
-        min_y = 15
+        min_y = self.pen_pixbuf.get_height() / 2
         max_y = alloc.height - min_y
 
         def get_random_pos():
