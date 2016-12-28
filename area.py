@@ -20,6 +20,8 @@ import math
 import cairo
 import random
 
+from gettext import gettext as _
+
 from levels import LEVELS
 
 import gi
@@ -106,6 +108,9 @@ class Area(Gtk.DrawingArea):
                 context, self.pen_pixbuf, pen_x, pen_y)
             context.paint()
 
+        else:
+            self.show_next_level_message(context)
+
     def __press_cb(self, widget, event):
         self.load_random_color()
 
@@ -164,6 +169,14 @@ class Area(Gtk.DrawingArea):
             self.points[self.color_count][1].append(self.pen)
 
         self.redraw()
+
+    def show_next_level_message(self, context):
+        y = 60
+        message = _("When you finish a drawing,") + "\n"
+        message += _("click on the star to move on to the next one!")
+
+        y += self.show_message(context, message, y=y)
+        y += self.show_message(context, _("Try click on the star now."), y=y)
 
     def draw_dots(self, context):
         dot_radius = 15
@@ -256,6 +269,32 @@ class Area(Gtk.DrawingArea):
             "star": get_random_pos(),
             "dots": dots
         }
+
+    def show_message(self, context, message, font_size=34, y=None):
+        if len(message.splitlines()) > 1:
+            y = 60
+            for line in message.splitlines():
+                y += self.show_message(context, line, font_size, y)
+
+            return y
+
+        else:
+            alloc = self.get_allocation()
+
+            context.set_source_rgb(0, 0, 0)
+            context.set_font_size(font_size)
+
+            xb, yb, width, height, xa, ya = context.text_extents(message)
+            y = y or 60 + height
+
+            if width > alloc.width:
+                self.show_message(context, message, font_size - 10)
+
+            else:
+                context.move_to(alloc.width / 2 - width / 2, y)
+                context.show_text(message)
+
+            return height
 
     def redraw(self):
         self.queue_draw()

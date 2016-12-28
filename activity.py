@@ -61,13 +61,6 @@ class ConnectTheDotsActivity(activity.Activity):
         button_new.connect("clicked", self._next_level)
         toolbarbox.toolbar.insert(button_new, -1)
 
-        label = Gtk.Label(_(
-            "Click on the star and then drag the turtle from 1 to 2 to 3..."))
-
-        item = Gtk.ToolItem()
-        item.add(label)
-        toolbarbox.toolbar.insert(item, -1)
-
         separator = Gtk.SeparatorToolItem()
         separator.props.draw = False
         separator.set_expand(True)
