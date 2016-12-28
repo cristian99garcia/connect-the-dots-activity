@@ -95,7 +95,7 @@ class Area(Gtk.DrawingArea):
                 self.star_pixbuf.get_width() / 2
 
             star_y = self.level_data["star"][1] - \
-                self.star_pixbuf.get_height() / 2
+                self.star_pixbuf.get_height() / 2 + 30
 
             pen_x = self.pen[0] - self.pen_pixbuf.get_width() / 2
             pen_y = self.pen[1] - self.pen_pixbuf.get_height() / 2
@@ -189,7 +189,7 @@ class Area(Gtk.DrawingArea):
 
         for dot in self.level_data["dots"]:
             x = dot[0]
-            y = dot[1]
+            y = dot[1] + dot_radius * 2
             label = str(index)
             xb, yb, label_width, label_height, xa, ya = \
                 context.text_extents(label)
@@ -249,14 +249,14 @@ class Area(Gtk.DrawingArea):
         del self.points
         self.points = {}
         self.color_count = 0
-        self.pen = [self.level_data["star"][0], self.level_data["star"][1]]
+        self.pen = [self.level_data["star"][0], self.level_data["star"][1] + 30]
 
     def get_random_level(self):
         alloc = self.get_allocation()
         min_x = self.pen_pixbuf.get_width() / 2
         max_x = alloc.width - min_x
         min_y = self.pen_pixbuf.get_height() / 2
-        max_y = alloc.height - min_y
+        max_y = alloc.height - min_y - 30
 
         def get_random_pos():
             return [random.randint(min_x, max_x), random.randint(min_y, max_y)]
