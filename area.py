@@ -107,7 +107,6 @@ class Area(Gtk.DrawingArea):
             Gdk.cairo_set_source_pixbuf(
                 context, self.pen_pixbuf, pen_x, pen_y)
             context.paint()
-
         else:
             self.show_next_level_message(context)
 
@@ -172,11 +171,11 @@ class Area(Gtk.DrawingArea):
 
     def show_next_level_message(self, context):
         y = 60
-        message = _("When you finish a drawing,") + "\n"
-        message += _("click on the star to move on to the next one!")
+        message = _("After you finish your drawing,") + "\n"
+        message += _("you must click on the Star to generate a new one")
 
         y += self.show_message(context, message, y=y)
-        y += self.show_message(context, _("Try click on the star now."), y=y)
+        y += self.show_message(context, _("Click it now, to start the game"), y=y)
 
     def draw_dots(self, context):
         dot_radius = 15
